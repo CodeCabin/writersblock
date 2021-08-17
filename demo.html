@@ -1,0 +1,58 @@
+<style type="text/css">
+	body {
+		font-family: sans-serif;
+	}
+</style>
+<script src="https://kit.fontawesome.com/1acbbeac4b.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" type="text/css" href="css/writersblock.css">
+
+<textarea class="writersblock" placeholder="Start writing here..." name="article_content" disabled="disabled"><strong>The fundamentals of programming</strong><p>Learn the principles, and the building block ideas; without ever starting code.</p><p>How to build simple apps in 2 hours, so you can release them in 5 hours.</p><p>Learn the foundations, and the ideas behind programming; without ever starting code.</p><p>A few of those principles</p><strong>Being an amazing programmer</strong><p>Being an amazing programmer comes with a number of challenges. Being amazing means being able to work well with the other developers in your team; communicate product ideas and concepts that matter; and then take those work to its most optimal level.</p></textarea>
+
+<button class="getSel">Get Selection (API)</button>
+<button class="expandSel">Expand Selection (API)</button>
+
+<script type="text/javascript" src="js/writersblock.js"></script>
+
+<script type="text/javascript">
+	const text = new WritersBlock('.writersblock', { 
+		enableLogs : true,
+		predictionMode : (selection) => {
+			selection.modify('extend', 'backward', 'word');	
+			selection.modify('extend', 'backward', 'character');
+
+			return true;	
+		},
+		predictions : [
+			'/expand',
+			'/listicle',
+		],
+		customTools : [
+			{
+				tag : 'custom-content-group',
+				tools : {
+					'cutsom-generate' : {
+						text : 'EXP',
+						title : 'Expand',
+						shortcut : {
+							commandKey: true,
+							shiftKey: true,
+							actionKey : 'Enter'
+						},
+						action : (editor) => {console.log(editor.getSelection().toString()); }
+					}
+				}
+			}
+		]
+	});
+
+	const button = document.querySelector('.getSel');
+	button.addEventListener('click', function(){
+		console.log(text.getSelection());
+	});
+
+	const expand = document.querySelector('.expandSel');
+	expand.addEventListener('click', function(){
+		text.modifySelection("extend", "backward", "word");
+	});
+</script>
