@@ -825,7 +825,7 @@ class WritersBlock {
 		if(selection){
 			this.onToolAction({command : 'selectAll'});
 		} else {
-			window.getSelection().selectAllChildren(text.elements.editor);
+			window.getSelection().selectAllChildren(this.elements.editor);
 		}
 		this.onUpdateSelection();
 	}
