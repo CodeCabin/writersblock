@@ -219,11 +219,11 @@ class WritersBlock {
 
 		this.elements.editor.addEventListener('keyup', (event) => {
 			this.onUpdateSelection();
-			this.onKeyboardShortcut(event);
 			this.onPredictInput();
 		});
 
 		this.elements.editor.addEventListener('keydown', (event) => {
+			this.onKeyboardShortcut(event);
 			this.onPredictApply(event);
 		});
 
