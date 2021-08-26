@@ -1095,8 +1095,6 @@ class WritersBlock {
 			range = range.cloneRange();
 			let anchor = range.startContainer || range.endContainer;
 
-			console.log('tag-update');
-
 			if(anchor && anchor.parentElement){
 				if(this.elements.editor.contains(anchor.parentElement)){
 					while(anchor && anchor !== this.elements.editor){
