@@ -36,6 +36,8 @@ class WritersBlock {
 		this.parseOptions(options);
 		this.parseElement(element);
 		this.build();
+
+		this.triggerHook("onReady");
 	}
 
 	/**
@@ -77,7 +79,8 @@ class WritersBlock {
 			content : "",
 			predictionMode : WritersBlock.PREDICTION_MODE_OFF,
 			predictionPolicy : WritersBlock.PREDICTION_POLICY_PARTIAL,
-			predictions : false
+			predictions : false,
+			events : {}
 		};
 	}
 
@@ -147,6 +150,8 @@ class WritersBlock {
 			this.buildPopup();
 
 			this.elements.root.before(this.elements.wrap);
+
+			this.triggerHook("onBuild");
 		} else {
 			this.log("Editor could not be initialized", WritersBlock.LOG_LEVEL_ERROR);
 		}
@@ -192,6 +197,8 @@ class WritersBlock {
 		}
 
 		this.elements.wrap.appendChild(this.elements.toolbar);
+
+		this.triggerHook("onBuildToolbar");
 	}
 
 	/**
@@ -252,6 +259,8 @@ class WritersBlock {
 		this.elements.root.classList.add('writersblock-hidden');
 
 		this.elements.wrap.appendChild(this.elements.editor);
+
+		this.triggerHook("onBuildEditor");
 	}
 
 	/**
@@ -278,6 +287,8 @@ class WritersBlock {
 		}
 
 		this.elements.wrap.appendChild(this.elements.popup);
+
+		this.triggerHook("onBuildPopup");
 	}
 
 	/**
@@ -391,6 +402,7 @@ class WritersBlock {
 		this.elements.wrap.appendChild(modal);
 		this.activeModal = modal;
 
+		this.triggerHook("onBuildModal", {modal : modal});
 	}
 
 	/**
@@ -467,6 +479,8 @@ class WritersBlock {
 				document.execCommand(command, false, value ? value : null);
 			}
 		}
+
+		this.triggerHook("onToolAction", {context : context});
 	}
 
 	/**
@@ -491,6 +505,8 @@ class WritersBlock {
 				break;
 
 		}
+
+		this.triggerHook("onEditorChange");
 	}
 
 	/**
@@ -512,6 +528,8 @@ class WritersBlock {
 		}
 
 		this.updateToolbar();
+
+		this.triggerHook("onUpdateSelection", {selection : selection});
 	}
 
 	/**
@@ -539,7 +557,9 @@ class WritersBlock {
 
 		if(this.shortcuts[slug]){
 			this.onToolAction(this.shortcuts[slug]);
+			this.triggerHook("onKeyboardShortcut", {slug : slug});
 		}
+
 	}
 
 	/**
@@ -572,6 +592,8 @@ class WritersBlock {
 
 				}
 			}
+			
+			this.triggerHook("onPredictApply");
 		}
 	}
 
@@ -696,6 +718,8 @@ class WritersBlock {
 			/* Destroy the active modal */
 			this.activeModal.remove();
 			this.activeModal = false;
+
+			this.triggerHook("onCloseModal");
 		}
 	}
 
@@ -709,6 +733,8 @@ class WritersBlock {
 	setContent(html){
 		this.elements.editor.innerHTML = html;
 		this.onEditorChange();
+
+		this.triggerHook("onSetContent");
 	}
 
 	/** 
@@ -752,6 +778,8 @@ class WritersBlock {
 		const range = this.getLastRange();
 		this.elements.editor.focus();
 		this.setSelection(range);
+
+		this.triggerHook("onRestoreSelection");
 	}
 
 	/**
@@ -769,6 +797,8 @@ class WritersBlock {
 			selection.removeAllRanges();
 			selection.addRange(range);
 			this.onUpdateSelection();
+
+			this.triggerHook("onSetSelection");
 		}
 	}
 
@@ -799,6 +829,8 @@ class WritersBlock {
 		}
 
 		this.onUpdateSelection();
+
+		this.triggerHook("onCollapseSelection");
 	}
 
 	/**
@@ -814,6 +846,7 @@ class WritersBlock {
 		const selection = this.getSelection();
 		if(selection){
 			selection.modify(type, direction, granularity);
+			this.triggerHook("onModifySelection", {type : type, direction : direction, granularity : granularity});
 		}
 	}
 
@@ -830,6 +863,8 @@ class WritersBlock {
 			window.getSelection().selectAllChildren(this.elements.editor);
 		}
 		this.onUpdateSelection();
+
+		this.triggerHook("onSelectAll");
 	}
 
 	/**
@@ -1011,6 +1046,8 @@ class WritersBlock {
 		} else {
 			this.onToolAction({command : 'insertHTML', value : text});
 		}
+
+		this.triggerHook("onWrite", {text : text, mode : mode, isHtml : isHtml});
 	}
 
 	/**
@@ -1058,6 +1095,9 @@ class WritersBlock {
 				this.elements.popup.classList.remove('active');
 			}
 		}
+
+		this.triggerHook("onUpdatePopupTools", {visible : this.elements.popup.classList.contains('active')});
+
 	}
 
 	/**
@@ -1070,6 +1110,7 @@ class WritersBlock {
 	hidePopupTools(){
 		if(this.elements.popup){
 			this.elements.popup.classList.remove('active');
+			this.triggerHook("onHidePopupTools");
 		}
 	}
 
@@ -1136,6 +1177,8 @@ class WritersBlock {
 				}
 			}
 		}
+
+		this.triggerHook("onUpdateToolbar");
 	}
 
 	/**
@@ -1328,12 +1371,6 @@ class WritersBlock {
 			}
 		];
 
-		/*
-		<a href="#" data-command='createlink'><i class='fa fa-link'></i></a>
-		<a href="#" data-command='unlink'><i class='fa fa-unlink'></i></a>
-		<a href="#" data-command='insertimage'><i class='fa fa-image'></i></a>
-		*/
-
 		if(this.config.customTools){
 			if(this.config.customTools instanceof Array){
 				for(let i in this.config.customTools){
@@ -1471,6 +1508,8 @@ class WritersBlock {
 					command : command,
 					value : value
 				};
+
+				this.triggerHook("onRegisterShortcut", {slug : slug});
 			}
 		} else {
 			this.log("Custom shortcut not registered, missing action key.", WritersBlock.LOG_LEVEL_WARNING);
@@ -1516,6 +1555,8 @@ class WritersBlock {
 				element.setAttribute(i, attributes[i]);
 			}
 		}
+
+		this.triggerHook("onCreateElement", {element : element});
 
 		return element;
 	}
@@ -1586,6 +1627,8 @@ class WritersBlock {
 			this.onToolAction(event.currentTarget);
 		});
 
+		this.triggerHook("onCreateToolButton", {element : toolButton});
+
 		return toolButton;
 	}
 
@@ -1628,6 +1671,37 @@ class WritersBlock {
 	*/
 	executeCommand(command, value){
 		this.log("Internal execute command has not been developed, if document.execCommand has not been fully deprecated, please enable the 'USE_DEPRECATED_COMMANDS' constant", WritersBlock.LOG_LEVEL_WARNING);
+	}
+
+	/**
+	 * Checks the config.events object for a specific event slug, and passes any relevant arguments to this as a 'callback'
+	 * 
+	 * At the same time, triggers a custom event with the same data in place, allowing developers to bind to either option, based on the base method name 
+	 * 
+	 * @param string slug The event/callback name
+	 * @param object params The data to send with the event/callback 
+	 *
+	 * @return false
+	*/
+	triggerHook(slug, params){
+		const eventName = 'writersblock.' + slug;
+		const eventData = {
+			instance : this, 
+			data : params ? params : false
+		};
+
+		if(this.config.events && this.config.events instanceof Object){
+			if(this.config.events[slug] && typeof this.config.events[slug] === "function"){
+				this.config.events[slug](eventData);
+			}
+		}
+
+		try{
+			const event = new CustomEvent(eventName, { detail: eventData });
+			document.body.dispatchEvent(event);
+		} catch (ex){
+			this.log(ex, WritersBlock.LOG_LEVEL_WARNING);
+		}
 	}
 
 	/**
