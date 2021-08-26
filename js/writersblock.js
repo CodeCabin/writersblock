@@ -510,6 +510,8 @@ class WritersBlock {
 				this.updatePopupTools();
 			}
 		}
+
+		this.updateToolbar();
 	}
 
 	/**
@@ -1072,6 +1074,73 @@ class WritersBlock {
 	}
 
 	/**
+	 * Updates the toolbar, and as a result, all popup tools
+	 * 
+	 * This is useful for tracking formatting in place, however, could be used for other tools as well. 
+	 * 
+	 * It should not be excessive, once it becomes excessive, it will be separated into multiple sub-methods
+	 * 
+	 * @return void
+	*/
+	updateToolbar(){
+		const groups = this.getTools();
+		let range = this.getLastRange();
+
+		const toolButtons = this.elements.wrap.querySelectorAll('a.tool');
+		for(let button of toolButtons){
+			button.classList.remove('active');
+		}
+
+		if(range){
+			range = range.cloneRange();
+			let anchor = range.startContainer || range.endContainer;
+
+			console.log('tag-update');
+
+			if(anchor && anchor.parentElement){
+				if(this.elements.editor.contains(anchor.parentElement)){
+					while(anchor && anchor !== this.elements.editor){
+						/* Walk the dom up to the editor */
+						if(anchor.tagName){
+							const tag = anchor.tagName.toLowerCase();
+							let match = false;
+							
+							for(let i in groups){
+								if(match){ break; }
+
+								const group = groups[i];
+								if(group.tools){
+									for(let t in group.tools){
+										if(match){ break; }
+
+										const tool = group.tools[t];
+										if(tool.action === 'formatBlock' && t === tag){
+											const activeToolButtons = this.elements.wrap.querySelectorAll('a.tool[data-command="formatBlock"][data-value="' + t + '"');
+											for(let button of activeToolButtons){
+												button.classList.add('active');
+											}
+										} else if (tool.formattingTags && tool.formattingTags instanceof Array){
+											if(tool.formattingTags.indexOf(tag) !== -1){
+												const activeToolButtons = this.elements.wrap.querySelectorAll('a.tool[data-command="' + t + '"]');
+												for(let button of activeToolButtons){
+													button.classList.add('active');
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
+						anchor = anchor.parentElement || false;
+
+					} 
+				}
+			}
+		}
+	}
+
+	/**
 	 * Get the deault tools, grouped into sections for the toolbar
 	 * 
 	 * Then go ahead and add any custom tools, as registered in the options object
@@ -1133,21 +1202,25 @@ class WritersBlock {
 					'bold' : {
 						icon : 'fas fa-bold',
 						title : 'Strong',
-						shortcut : commandKey + ' + B'
+						shortcut : commandKey + ' + B',
+						formattingTags : ['b', 'strong']
 					},
 					'italic' : {
 						icon : 'fas fa-italic',
 						title : 'Emphasis',
-						shortcut : commandKey + ' + I'
+						shortcut : commandKey + ' + I',
+						formattingTags : ['i', 'em']
 					},
 					'underline' : {
 						icon : 'fas fa-underline',
 						title : 'Underline',
-						shortcut : commandKey + ' + U'
+						shortcut : commandKey + ' + U',
+						formattingTags : ['u']
 					},
 					'strikeThrough' : {
 						icon : 'fas fa-strikethrough',
-						title : 'Deleted'
+						title : 'Deleted',
+						formattingTags : ['strike']
 					}
 				}
 			},

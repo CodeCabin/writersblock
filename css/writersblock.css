@@ -1,6 +1,8 @@
 .writersblock-wrapper {
-	--writersblock-grey-100 : #eee;
-	--writersblock-grey-900 : #333;
+    --writersblock-grey-100 : #eeeeee;
+	--writersblock-grey-200 : #e0e0e0;
+	--writersblock-grey-900 : #333333;
+
 }
 
 .writersblock-wrapper {
@@ -182,6 +184,13 @@
     opacity: 0.5;
 }
 
+.writersblock-wrapper .writersblock-toolbar a.tool.active {
+    background: var(--writersblock-grey-100);
+}
+
+.writersblock-wrapper .writersblock-popup-tools a.tool.active {
+    background: var(--writersblock-grey-200);
+}
 
 .writersblock-hidden {
 	display: none !important;
