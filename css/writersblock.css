@@ -150,7 +150,8 @@
     flex:  1;
 }
 
-.writersblock-modal .writersblock-modal-inner .writersblock-modal-body .writersblock-modal-field input{
+.writersblock-modal .writersblock-modal-inner .writersblock-modal-body .writersblock-modal-field input,
+.writersblock-modal .writersblock-modal-inner .writersblock-modal-body .writersblock-modal-field select{
     padding: 5px;
     border: none; 
     border-radius: 3px;

@@ -341,14 +341,33 @@ class WritersBlock {
 						element.appendChild(label);
 					}
 
-					const input = this.createElement('input', ['writersblock-modal-field-input'], {
-						type : field.type || 'text',
-						placeholder : field.placeholder || '',
-						value : field.value || '',
-						name : field.name || '' 
-					});
+					if(field.type && field.type === 'select'){
+						const select = this.createElement('select', ['writersblock-modal-field-input'], {
+							value : field.value || '',
+							name : field.name
+						});
 
-					element.appendChild(input);
+						if(field.options && field.options instanceof Object){
+							for(let optionValue in field.options){
+								const option = this.createElement('option');
+								option.setAttribute('value', optionValue);
+								option.innerText = field.options[optionValue];
+
+								select.appendChild(option);
+							}
+						}
+
+						element.appendChild(select);
+					} else {
+						const input = this.createElement('input', ['writersblock-modal-field-input'], {
+							type : field.type || 'text',
+							placeholder : field.placeholder || '',
+							value : field.value || '',
+							name : field.name || '' 
+						});
+
+						element.appendChild(input);
+					}
 
 					body.appendChild(element);
 				}
