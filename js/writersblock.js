@@ -795,7 +795,10 @@ class WritersBlock {
 	*/
 	restoreSelection(){
 		const range = this.getLastRange();
-		this.elements.editor.focus();
+
+		/* Focusing here can cause a few strange scroll movements, it seems to be un-needed */
+		/* this.elements.editor.focus(); */
+		
 		this.setSelection(range);
 
 		this.triggerHook("onRestoreSelection");
