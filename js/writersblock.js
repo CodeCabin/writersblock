@@ -1008,7 +1008,7 @@ class WritersBlock {
 						
 						activeSelection.selectAllChildren(match);
 
-						ranges.push(activeSelection.getRangeAt(0));
+						ranges.push(activeSelection.getRangeAt(0).cloneRange());
 					}
 				}
 
