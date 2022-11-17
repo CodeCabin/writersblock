@@ -575,6 +575,10 @@ class WritersBlock {
 		}
 
 		if(this.shortcuts[slug]){
+			if(this.shortcuts[slug].preventDefault){
+				event.preventDefault();
+			}
+
 			this.onToolAction(this.shortcuts[slug]);
 			this.triggerHook("onKeyboardShortcut", {slug : slug});
 		}
@@ -1530,6 +1534,10 @@ class WritersBlock {
 					command : command,
 					value : value
 				};
+
+				if(shortcut.preventDefault){
+					this.shortcuts[slug].preventDefault = shortcut.preventDefault;
+				}
 
 				this.triggerHook("onRegisterShortcut", {slug : slug});
 			}
