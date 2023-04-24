@@ -1431,6 +1431,18 @@ class WritersBlock {
 			}
 		}
 
+		/* Allow integrations to filter/mutate the entire tool list at init via a filter function */
+		if(this.config.toolFilter && typeof this.config.toolFilter === 'function'){
+			for(let groupIndex in groups){
+				let group = groups[groupIndex];
+				if(group.tag && group.tools){
+					for(let tool in group.tools){
+						groups[groupIndex].tools[tool] = this.config.toolFilter(group.tools[tool], tool, group.tag);
+					}
+				}
+			}
+		}
+
 		if(!this.cache.tools){
 			/* Store to a local cache, so that future calls can use that instead of rebuilding */
 			this.cache.tools = groups;
